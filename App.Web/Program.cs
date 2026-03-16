@@ -40,6 +40,6 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-// rob is a bad person who doesn't protect the main branch
+
 
 public partial class Program { }
