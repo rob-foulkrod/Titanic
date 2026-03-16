@@ -1,0 +1,117 @@
+@model IEnumerable<App.Web.Models.TodoItem>
+@using App.Web.Models
+
+@{
+    ViewData["Title"] = "My Tasks";
+    var filter = ViewBag.Filter as string ?? "all";
+    int total = ViewBag.TotalCount;
+    int active = ViewBag.ActiveCount;
+    int completed = ViewBag.CompletedCount;
+}
+
+<div class="page-hero d-flex justify-content-between align-items-start flex-wrap gap-3">
+    <div>
+        <h1>📋 My Tasks</h1>
+        <p class="mb-0">Stay organized, stay productive.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-todo-accent">
+        <strong>+ Add Task</strong>
+    </a>
+</div>
+
+<!-- Stats -->
+<div class="todo-stats">
+    <div class="todo-stat">
+        <div class="stat-number">@total</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="todo-stat">
+        <div class="stat-number" style="color: var(--todo-accent)">@active</div>
+        <div class="stat-label">Active</div>
+    </div>
+    <div class="todo-stat">
+        <div class="stat-number" style="color: var(--todo-success)">@completed</div>
+        <div class="stat-label">Done</div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div class="todo-filters">
+        <a asp-action="Index" asp-route-filter="all"
+           class="todo-filter-btn @(filter == "all" ? "active" : "")">All</a>
+        <a asp-action="Index" asp-route-filter="active"
+           class="todo-filter-btn @(filter == "active" ? "active" : "")">Active</a>
+        <a asp-action="Index" asp-route-filter="completed"
+           class="todo-filter-btn @(filter == "completed" ? "active" : "")">Completed</a>
+    </div>
+</div>
+
+<!-- Todo List -->
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <h4>@(filter == "completed" ? "Nothing completed yet" : filter == "active" ? "All done!" : "No tasks yet")</h4>
+        <p>@(filter == "active" ? "You've completed all your tasks. Great work!" : "Add your first task to get started.")</p>
+        @if (filter != "active")
+        {
+            <a asp-action="Create" class="btn btn-todo-primary mt-2">+ Add your first task</a>
+        }
+    </div>
+}
+else
+{
+    <div class="todo-list">
+        @foreach (var item in Model)
+        {
+            <div class="todo-item @(item.IsCompleted ? "completed" : "")">
+                <!-- Toggle Complete -->
+                <form asp-action="ToggleComplete" asp-route-id="@item.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="todo-check @(item.IsCompleted ? "checked" : "")"
+                            style="@(item.IsCompleted ? "background: var(--todo-success); border-color: var(--todo-success);" : "")"
+                            title="@(item.IsCompleted ? "Mark as active" : "Mark as complete")"
+                            aria-label="@(item.IsCompleted ? "Mark as active" : "Mark as complete")">
+                        @if (item.IsCompleted)
+                        {
+                            <span style="color:white;font-size:0.75rem;font-weight:700;line-height:1">✓</span>
+                        }
+                    </button>
+                </form>
+
+                <!-- Content -->
+                <div class="todo-item-content">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="todo-title">@item.Title</span>
+                        <span class="priority-badge priority-@item.Priority.ToString().ToLower()">
+                            @item.Priority
+                        </span>
+                        @if (item.IsCompleted)
+                        {
+                            <span class="priority-badge" style="background: var(--todo-success-light); color: var(--todo-success)">✓ Done</span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Notes))
+                    {
+                        <p class="todo-meta mb-0 mt-1">@item.Notes</p>
+                    }
+                    <p class="todo-meta mb-0">
+                        Added @item.CreatedAt.ToLocalTime().ToString("MMM d, yyyy h:mm tt")
+                        @if (item.IsCompleted && item.CompletedAt.HasValue)
+                        {
+                            <span> &bull; Completed @item.CompletedAt.Value.ToLocalTime().ToString("MMM d, yyyy")</span>
+                        }
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div class="todo-actions">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-icon" title="Edit">✏️</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-icon" title="Details">👁</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn-icon btn-icon-danger" title="Delete">🗑</a>
+                </div>
+            </div>
+        }
+    </div>
+}

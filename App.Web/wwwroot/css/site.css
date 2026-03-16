@@ -1,0 +1,441 @@
+/* ===========================
+   CSS Custom Properties
+   =========================== */
+:root {
+    --todo-primary: #0891b2;       /* Teal */
+    --todo-primary-dark: #0e7490;
+    --todo-primary-light: #e0f2fe;
+    --todo-accent: #f97316;        /* Orange accent */
+    --todo-accent-light: #fff7ed;
+    --todo-success: #16a34a;
+    --todo-success-light: #dcfce7;
+    --todo-danger: #dc2626;
+    --todo-danger-light: #fee2e2;
+    --todo-warning: #d97706;
+    --todo-warning-light: #fef3c7;
+    --todo-bg: #f0f9ff;
+    --todo-surface: #ffffff;
+    --todo-text: #1e293b;
+    --todo-text-muted: #64748b;
+    --todo-border: #e2e8f0;
+    --todo-radius: 12px;
+    --todo-shadow: 0 2px 12px rgba(8, 145, 178, 0.1);
+    --todo-shadow-hover: 0 6px 24px rgba(8, 145, 178, 0.18);
+}
+
+/* ===========================
+   Base Styles
+   =========================== */
+html {
+    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    background-color: var(--todo-bg);
+    color: var(--todo-text);
+    margin-bottom: 60px;
+    line-height: 1.6;
+}
+
+/* ===========================
+   Navbar
+   =========================== */
+.todo-navbar {
+    background: linear-gradient(135deg, var(--todo-primary) 0%, var(--todo-primary-dark) 100%);
+    box-shadow: 0 2px 12px rgba(8, 145, 178, 0.25);
+    padding: 0.75rem 0;
+}
+
+.todo-navbar .navbar-brand span {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.todo-navbar .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+    font-weight: 500;
+    transition: color 0.2s;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.todo-navbar .nav-link:hover {
+    color: #ffffff !important;
+    background: rgba(255,255,255,0.12);
+}
+
+/* ===========================
+   Cards & Panels
+   =========================== */
+.todo-card {
+    background: var(--todo-surface);
+    border-radius: var(--todo-radius);
+    box-shadow: var(--todo-shadow);
+    border: 1px solid var(--todo-border);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.todo-card:hover {
+    box-shadow: var(--todo-shadow-hover);
+    transform: translateY(-1px);
+}
+
+.todo-card-header {
+    background: linear-gradient(135deg, var(--todo-primary-light), #f0f9ff);
+    border-bottom: 1px solid var(--todo-border);
+    border-radius: var(--todo-radius) var(--todo-radius) 0 0;
+    padding: 1.25rem 1.5rem;
+}
+
+/* ===========================
+   Todo Items
+   =========================== */
+.todo-item {
+    border-radius: 10px;
+    border: 1px solid var(--todo-border);
+    background: var(--todo-surface);
+    margin-bottom: 0.75rem;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.todo-item:hover {
+    border-color: var(--todo-primary);
+    box-shadow: var(--todo-shadow);
+}
+
+.todo-item.completed {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    opacity: 0.75;
+}
+
+.todo-item.completed .todo-title {
+    text-decoration: line-through;
+    color: var(--todo-text-muted);
+}
+
+.todo-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.todo-title {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--todo-text);
+    margin-bottom: 0;
+    word-break: break-word;
+}
+
+.todo-meta {
+    font-size: 0.8rem;
+    color: var(--todo-text-muted);
+    margin-top: 0.25rem;
+}
+
+.todo-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ===========================
+   Priority Badges
+   =========================== */
+.priority-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.priority-high {
+    background: var(--todo-danger-light);
+    color: var(--todo-danger);
+}
+
+.priority-medium {
+    background: var(--todo-warning-light);
+    color: var(--todo-warning);
+}
+
+.priority-low {
+    background: var(--todo-success-light);
+    color: var(--todo-success);
+}
+
+/* ===========================
+   Stats Bar
+   =========================== */
+.todo-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.todo-stat {
+    background: var(--todo-surface);
+    border: 1px solid var(--todo-border);
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    min-width: 100px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.todo-stat .stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--todo-primary);
+    line-height: 1;
+}
+
+.todo-stat .stat-label {
+    font-size: 0.75rem;
+    color: var(--todo-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.2rem;
+}
+
+/* ===========================
+   Filter Tabs
+   =========================== */
+.todo-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    background: var(--todo-surface);
+    padding: 0.35rem;
+    border-radius: 10px;
+    border: 1px solid var(--todo-border);
+    width: fit-content;
+}
+
+.todo-filter-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--todo-text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.todo-filter-btn:hover,
+.todo-filter-btn.active {
+    background: var(--todo-primary);
+    color: white;
+}
+
+/* ===========================
+   Buttons
+   =========================== */
+.btn-todo-primary {
+    background: var(--todo-primary);
+    border-color: var(--todo-primary);
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s;
+}
+
+.btn-todo-primary:hover {
+    background: var(--todo-primary-dark);
+    border-color: var(--todo-primary-dark);
+    color: white;
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-todo-accent {
+    background: var(--todo-accent);
+    border-color: var(--todo-accent);
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s;
+}
+
+.btn-todo-accent:hover {
+    background: #ea6c05;
+    border-color: #ea6c05;
+    color: white;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    border-radius: 8px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--todo-border);
+    background: white;
+    color: var(--todo-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-icon:hover {
+    border-color: var(--todo-primary);
+    color: var(--todo-primary);
+    background: var(--todo-primary-light);
+}
+
+.btn-icon-danger:hover {
+    border-color: var(--todo-danger);
+    color: var(--todo-danger);
+    background: var(--todo-danger-light);
+}
+
+/* ===========================
+   Forms
+   =========================== */
+.form-control, .form-select {
+    border-color: var(--todo-border);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    color: var(--todo-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--todo-primary);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--todo-text);
+    margin-bottom: 0.4rem;
+}
+
+/* ===========================
+   Alert
+   =========================== */
+.todo-alert {
+    border-radius: 10px;
+    border: none;
+    background: var(--todo-success-light);
+    color: var(--todo-success);
+    font-weight: 500;
+}
+
+/* ===========================
+   Page Headers
+   =========================== */
+.page-hero {
+    margin-bottom: 2rem;
+}
+
+.page-hero h1 {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: var(--todo-text);
+}
+
+.page-hero p {
+    color: var(--todo-text-muted);
+}
+
+/* ===========================
+   Empty State
+   =========================== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--todo-text-muted);
+}
+
+.empty-state .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ===========================
+   Toggle Checkbox
+   =========================== */
+.todo-check {
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    border: 2px solid var(--todo-border);
+    flex-shrink: 0;
+    cursor: pointer;
+    background: white;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.todo-check:checked {
+    background: var(--todo-success);
+    border-color: var(--todo-success);
+}
+
+.todo-check:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.todo-check:hover {
+    border-color: var(--todo-primary);
+}
+
+/* ===========================
+   Footer
+   =========================== */
+.todo-footer {
+    border-top: 1px solid var(--todo-border);
+    background: var(--todo-surface);
+}
+
+/* ===========================
+   Utility
+   =========================== */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--todo-primary);
+}
+
+.text-todo-primary { color: var(--todo-primary) !important; }
+.bg-todo-primary-light { background-color: var(--todo-primary-light) !important; }
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
