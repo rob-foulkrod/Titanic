@@ -1,0 +1,45 @@
+@model App.Web.Models.TodoItem
+
+@{
+    ViewData["Title"] = "Delete Task";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="todo-card">
+            <div class="todo-card-header" style="background: var(--todo-danger-light); border-color: #fca5a5;">
+                <h2 class="h4 mb-0 fw-bold" style="color: var(--todo-danger)">🗑 Delete Task</h2>
+                <p class="mb-0 small text-muted mt-1">This action cannot be undone.</p>
+            </div>
+            <div class="p-4">
+                <div class="p-3 rounded-3 mb-4" style="background: var(--todo-bg); border: 1px solid var(--todo-border)">
+                    <p class="fw-semibold mb-1">@Model.Title</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <p class="small text-muted mb-0">@Model.Notes</p>
+                    }
+                    <div class="d-flex gap-2 mt-2 flex-wrap">
+                        <span class="priority-badge priority-@Model.Priority.ToString().ToLower()">@Model.Priority</span>
+                        @if (Model.IsCompleted)
+                        {
+                            <span class="priority-badge" style="background: var(--todo-success-light); color: var(--todo-success)">Completed</span>
+                        }
+                    </div>
+                </div>
+
+                <p class="text-muted mb-4">Are you sure you want to delete <strong>@Model.Title</strong>?</p>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn"
+                                style="background: var(--todo-danger); color: white; border-radius: 8px; font-weight: 500; padding: 0.5rem 1.25rem;">
+                            Yes, Delete
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:8px">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
