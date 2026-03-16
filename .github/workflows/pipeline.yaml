@@ -1,0 +1,104 @@
+# CI Pipeline Workflow
+# ====================
+# This workflow implements Continuous Integration for the .NET application.
+# It runs on every push and pull request to the main branch,
+# executing two independent jobs in parallel:
+#   1. build-and-test: Compiles the solution and runs all unit tests
+#   2. codeql-analysis: Performs static code analysis using GitHub CodeQL
+#
+# Best Practices Applied:
+# - Least-privilege permissions: each job declares only the permissions it needs
+# - Pinned action versions: actions use exact versions for reproducibility and security
+# - Parallel jobs: independent jobs run concurrently to shorten feedback loops
+# - Caching: NuGet packages are cached via setup-dotnet to speed up subsequent runs
+# - Fail-fast defaults: any failure stops the pipeline early
+
+name: pipeline
+
+# Trigger on pushes and pull requests targeting the main branch.
+# This ensures every change is validated before and after merge.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Top-level permissions follow the principle of least privilege.
+# Individual jobs override these as needed.
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------
+  # Job 1: Build & Test
+  # ---------------------------------------------------------------
+  # Restores dependencies, compiles the solution, and runs all tests.
+  # Uses ubuntu-latest for faster provisioning and lower cost.
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository so the workflow can access the source code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install the required .NET SDK version.
+      # Caching is enabled by default in setup-dotnet to speed up restores.
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      # Restore NuGet packages as an explicit step for clearer logs.
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Build the solution in Release configuration without restoring again.
+      # --no-restore avoids redundant package resolution.
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      # Run all tests in the solution.
+      # --no-build avoids recompilation since we already built above.
+      # --verbosity normal provides useful output without excessive noise.
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+  # ---------------------------------------------------------------
+  # Job 2: CodeQL Analysis
+  # ---------------------------------------------------------------
+  # Runs GitHub CodeQL static analysis to detect security vulnerabilities
+  # and code quality issues. This job requires elevated permissions to
+  # read the code and write security findings.
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    # CodeQL needs additional permissions to upload analysis results.
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      # Check out the repository for analysis.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Initialize CodeQL for C# analysis.
+      # The 'default' query suite includes a balanced set of security
+      # and quality queries suitable for CI pipelines.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          queries: security-and-quality
+
+      # Autobuild detects the build system and compiles the project.
+      # For .NET projects it runs the equivalent of 'dotnet build'.
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # Run the CodeQL analysis and upload results to GitHub Security tab.
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
