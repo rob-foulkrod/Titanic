@@ -41,12 +41,12 @@ jobs:
     steps:
       # Check out the repository so the workflow can access the source code.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Install the required .NET SDK version.
       # Caching is enabled by default in setup-dotnet to speed up restores.
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "10.x"
 
@@ -83,7 +83,7 @@ jobs:
     steps:
       # Check out the repository for analysis.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Initialize CodeQL for C# analysis.
       # The 'default' query suite includes a balanced set of security
