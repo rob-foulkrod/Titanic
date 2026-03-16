@@ -1,10 +1,12 @@
-# CI Pipeline Workflow
-# ====================
-# This workflow implements Continuous Integration for the .NET application.
-# It runs on every push and pull request to the main branch,
-# executing two independent jobs in parallel:
+# CI/CD Pipeline Workflow
+# ======================
+# This workflow implements Continuous Integration and Continuous Deployment
+# for the .NET application. It runs on every push and pull request to the
+# main branch, executing the following jobs:
 #   1. build-and-test: Compiles the solution and runs all unit tests
 #   2. codeql-analysis: Performs static code analysis using GitHub CodeQL
+#   3. build: Depends on jobs 1 & 2, publishes the app and uploads the artifact
+#   4. deploy: Deploys the artifact to Azure Web Apps using OIDC authentication
 #
 # Best Practices Applied:
 # - Least-privilege permissions: each job declares only the permissions it needs
@@ -12,6 +14,7 @@
 # - Parallel jobs: independent jobs run concurrently to shorten feedback loops
 # - Caching: NuGet packages are cached via setup-dotnet to speed up subsequent runs
 # - Fail-fast defaults: any failure stops the pipeline early
+# - OIDC authentication: uses federated credentials for passwordless Azure login
 
 name: pipeline
 
@@ -102,3 +105,76 @@ jobs:
       # Run the CodeQL analysis and upload results to GitHub Security tab.
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v3
+
+  # ---------------------------------------------------------------
+  # Job 3: Build Artifact
+  # ---------------------------------------------------------------
+  # Depends on both build-and-test and codeql-analysis completing
+  # successfully. Publishes the application and uploads the artifact
+  # for use by the deploy job.
+  build:
+    name: Build Artifact
+    runs-on: ubuntu-latest
+    needs: [build-and-test, codeql-analysis]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Publish the web application in Release configuration.
+      # Output is placed in the publish directory for artifact upload.
+      - name: Publish application
+        run: dotnet publish App.Web/App.Web.csproj --configuration Release --output ./publish
+
+      # Upload the published output as a workflow artifact.
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact
+          path: ./publish
+
+  # ---------------------------------------------------------------
+  # Job 4: Deploy to Azure Web Apps
+  # ---------------------------------------------------------------
+  # Deploys the published artifact to Azure Web Apps using OIDC
+  # (OpenID Connect) federated credentials for passwordless authentication.
+  # Only runs on pushes to main (not on pull requests).
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-artifact
+          path: ./publish
+
+      # Authenticate to Azure using OIDC with default secret names.
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Deploy the application to Azure Web Apps.
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          package: ./publish
